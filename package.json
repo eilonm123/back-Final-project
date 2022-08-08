@@ -4,6 +4,8 @@
   "description": "back Final project",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "dev":"npx tsx watch ./src.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,5 +22,8 @@
   "dependencies": {
     "express": "^4.18.1",
     "mongoose": "^6.5.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
   }
 }
