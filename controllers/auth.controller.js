@@ -1,4 +1,17 @@
+const { sign } = require('jsonwebtoken');
 const { createUser, getUserByUsernameAndPassword } = require('../services/auth-service');
+const secret = process.env.SECRET
+
+async function login(req, res) {
+	const { username, password } = req.body;
+	const user = await getUserByUsernameAndPassword(username, password);
+	if (user) {
+		const token = sign({id: user._id}, secret)
+		res.send({ username: user.userName, id: user.id, token });
+	} else {
+		res.status(401).send({ message: 'invalid username or password' });
+	}
+}
 
 async function register(req, res) {
 	const user = await getUserByUsernameAndPassword(username, password);
@@ -13,4 +26,9 @@ async function register(req, res) {
 			res.status(400).send({ message: err.message });
 		}
 	}
+}
+
+module.exports = {
+	login,
+	register
 }
