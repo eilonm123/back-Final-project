@@ -1,5 +1,5 @@
 const users = [];
-const {readFileSync, writeFileSync} = require('fs');
+
 const { UserModel } = require('../models/user');
 
 function createUser(user = {}) {
@@ -7,7 +7,7 @@ function createUser(user = {}) {
 		throw new Error('username is required');
 	}
 
-	try{
+
 		const newUser = new UserModel({
 			firstName: user.firstName,
 			lastName: user.lastName,
