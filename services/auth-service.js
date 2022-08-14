@@ -1,5 +1,4 @@
 const users = [];
-const {readFileSync, writeFileSync} = require('fs');
 const { UserModel } = require('../models/user');
 
 function createUser(user = {}) {
