@@ -1,5 +1,7 @@
 
 const { createUser, getUserByUsernameAndPassword } = require('../services/auth-service');
+const { sign } = require('jsonwebtoken');
+const secret = process.env.SECRET
 
 async function register(req, res) {
 	const user = await getUserByUsernameAndPassword(username, password);
