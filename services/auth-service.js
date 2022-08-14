@@ -7,7 +7,7 @@ function createUser(user = {}) {
 		throw new Error('username is required');
 	}
 
-
+	try{
 		const newUser = new UserModel({
 			firstName: user.firstName,
 			lastName: user.lastName,
@@ -16,13 +16,17 @@ function createUser(user = {}) {
 		});
 		newUser.save()
 		return newUser;
+
 	}
+
+
 	catch {
 		throw Error(error)
-	}}
+	}
+}
 
 async function getUserByUsernameAndPassword(username, password) {
-	const user = await UserModel.findOne({userName: username, password: password})
+	const user = await UserModel.findOne({ userName: username, password: password })
 	return user
 
 }
