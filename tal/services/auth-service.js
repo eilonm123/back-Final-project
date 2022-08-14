@@ -7,7 +7,7 @@ function createUser(user = {}) {
 		throw new Error('username is required');
 	}
 
-	try{
+	try {
 		const newUser = new UserModel({
 			firstName: user.firstName,
 			lastName: user.lastName,
