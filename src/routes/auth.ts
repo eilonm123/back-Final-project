@@ -1,7 +1,7 @@
 import express from 'express'
 // import {login, register, userInfo} from '../controllers/auth-controller'
 import verifyUser from '../middlewares/verify-user'
-import {controllerRegister, controllerLogin} from '../controllers/auth-controller'
+import {register, login} from '../controllers/auth-controller'
 import bcrypt from 'bcrypt'
 
 const router = express.Router()
@@ -21,11 +21,11 @@ const router = express.Router()
 
 
 
-router.post('/api/login', controllerLogin)
-router.post('/api/register', controllerRegister)
+router.post('/api/login', login)
+router.post('/api/register', register)
 router.get('/api/user-info',verifyUser, (req, res) => {
-    // console.log(req.user)
-    // res.json(req.user)
+    // console.log(req.username)
+    // res.json(req.username)
 } )
 
 export default router

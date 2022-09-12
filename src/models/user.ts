@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema({ // value's first letter must be a capit
 
 UserSchema.pre('save', async function (next) {
     try {
-        const salt = process.env.MY_SALT
+        const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(this.password, salt)
         this.password = hashedPassword
         next()

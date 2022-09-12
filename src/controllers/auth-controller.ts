@@ -1,32 +1,27 @@
 import verifyUser from '../middlewares/verify-user';
 import {verify, sign} from 'jsonwebtoken'
-import { getUserByUsername, getUserByUsernameAndPassword, createUser, updateTokenTimeOfUserDB, createNewToken } from '../services/auth-service';
+import { getUserByUsername, getUserByUsernameAndPassword, createUser, updateTokenTimeOfUserDB, getTokenAndOptions } from '../services/auth-service';
 import bcrypt from 'bcrypt'
 import {cookieParser, cookie} from 'cookie-parser'
 
 
-export async function controllerLogin(req, res) {
+export async function login(req, res) {
     const { username, password } = req.body;
-    const salt = process.env.MY_SALT
-    const hashedPassword = await bcrypt.hash(password, salt)
-    const user = await getUserByUsernameAndPassword(username, hashedPassword);
-    if (user) {
-        // const signUser = { id: user._id }
-        // console.log(user._id)
-        const tokenDate = new Date().getTime()
-        // console.log(tokenDate)
-        await updateTokenTimeOfUserDB(user._id,tokenDate )
-        const tokenOptions =  await createNewToken(user._id, tokenDate)
-        res.cookie('cookieInsta', tokenOptions.token, tokenOptions.options )
-        res.send('yes')
-    }
-    else {
+    const user = await getUserByUsername(username);
+    if (!user) {
         res.sendStatus(401)
     }
-    }
+    else if(bcrypt.compare(password, user.password)) {
+        const tokenDate = new Date().getTime()
+        await updateTokenTimeOfUserDB(user._id,tokenDate )
+        const tokenAndOptions =  await getTokenAndOptions(user._id, tokenDate)
+        res.cookie('cookieInsta', tokenAndOptions.token, tokenAndOptions.options )
+        res.send('hello ' + user.username)
+    }}
 
-    export async function controllerRegister(req, res) {
+    export async function register(req, res) {
         const { username } = req.body
+        console.log(req.body)
         const user = await getUserByUsername(username);
         if (user) {
             res.send('user already exists')

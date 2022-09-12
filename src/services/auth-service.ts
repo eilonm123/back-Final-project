@@ -55,13 +55,12 @@ export async function updateTokenTimeOfUserDB(id, date) {
 	return user
 }
 
-export async function createNewToken(id, tokenDate) { // token return "createdAt" (date) and "signAt" (id)
+export async function getTokenAndOptions(id, tokenDate) { // token return "createdAt" (date) and "signAt" (id)
 	const signUser = { id: id }
 	const token = sign({ createdAt: tokenDate, signAt: signUser  }, process.env.SECRET)
 	const options = {
 		httpOnly: true
 	}
-	console.log(tokenDate)
 	return {token, options}
 }
 
