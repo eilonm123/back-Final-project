@@ -8,6 +8,8 @@ lerna-debug.log*
 .idea
 node_modules
 dist
+tal
+.env
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
