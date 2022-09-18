@@ -8,6 +8,6 @@ const appRouter = express.Router()
 
 appRouter.use(authRouter)
 appRouter.use(postsRouter)
-// appRouter.use(usersRouter)
+appRouter.use(usersRouter)
 
 export default appRouter

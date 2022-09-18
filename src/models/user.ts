@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({ // value's first letter must be a capit
     firstName: { type: String, required: true, validate: (value: string) => { !value.includes('-') } },
     lastName: { type: String, required: true, validate: (value: string) => { !value.includes('-') } },
     created: { type: Date, default: Date.now },
+    following: {type: Array, default: [] },
     username: { type: String, required: true, valIdate: (value: string) => { !(value.length < 4) }, unique: true },
     password: { type: String, required: true },
     email: {
