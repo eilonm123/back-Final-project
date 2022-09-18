@@ -21,7 +21,7 @@ export async function createUser(user: any = {}) {
 	}
 	catch(err) {
 		console.log(err)
-		throw new Error(err)
+		throw new Error() //מה להוסיף?<!!!
 	}
 }
 

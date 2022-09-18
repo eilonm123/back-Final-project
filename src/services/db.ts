@@ -13,8 +13,8 @@ export async function connectTodb() {
     console.log('connected to db')
 
   } catch (error) {
-    // throw new Error('could not connect')
-    return Promise.reject(new Error('could not connect'))
+    console.log(error);
+    return Promise.reject(new Error('error'))
   }
 }
 

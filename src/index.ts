@@ -9,19 +9,15 @@ const app = express();
 app.use(cookieParser())
 app.use(express.json())
 app.use(appRouter)
-
-// async function fetchSalt() {
-// 	const salt = await bcrypt.genSalt(10)
-// 	console.log(salt)
-// }
-// fetchSalt()
+const PORT = process.env.PORT || 3030;
 
 connectTodb() 
 
 dotenv.config()
 
-app.listen(process.env.PORT, () => {
-	console.log('listening on port 3000');
+
+app.listen(PORT , () => {
+	console.log(`listening on port ${PORT}`);
 })
 
 

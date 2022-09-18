@@ -1,9 +1,11 @@
-import { PostModel } from '../models/post'
+import { Post, PostModel } from '../models/post'
 
 
-export async function serviceCreatePost(postData: any = {}, username: String) {
-    const newPost = await PostModel.create(postData, username)
-    console.log(newPost)
+
+export async function serviceCreatePost(postData: Post, username: String) {
+    const newPost = new PostModel(postData)
+    await newPost.save()
+    return newPost
 }
 
 export async function serviceGetFeed() {
@@ -11,10 +13,43 @@ export async function serviceGetFeed() {
     return allPosts
 }
 
-// const PostSchema = new mongoose.Schema({ // value's first letter must be a capital letter
-//     author: {type: String, ref:"User", required: true, index: true},
-//     body: { type: String, required: true, validate: (value) => { value.length > 0 } },
-//     likes: { type: Number, default: 0},
-//     caption: {type: String},
-//     comments: {type: JSON},
-// })
+export async function getPostById(postId: string) {
+    const post = await PostModel.findById(postId);
+    return post;
+}
+
+export async function deletePostById(postId: string) {
+
+        const deletePost = await PostModel.findByIdAndDelete();
+}
+
+export async function chengePostById(id, prop:string ,value) { //שינוי פוסט
+    const chengeP = await PostModel.findByIdAndUpdate({_id: id}, {$set:{[prop]:value}},{new: true})
+    return chengeP;
+}
+
+export async function changeCommnetById(postId: string,comments,) {
+    const changeC = await PostModel
+
+}
+
+
+export async function changeLikeById(postId: string,) {
+    
+}
+
+
+
+
+
+
+// פוסט שינוי 
+//שינוי של תגובה
+//שינוי של לייק
+//לעלות תגובה
+//לעלות לייק
+//תיוגים לעלות
+//מחיקת תיוג
+
+///פוסט ממומן וסטורי ממומן
+
