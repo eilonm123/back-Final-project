@@ -15,26 +15,26 @@ async function verifyUser(req, res, next) {
 	} else {
 		try {
 			const tokenValue = await verify(token, process.env.SECRET) /* token return "createdAt" (date) and "signAt" (id) */
-			console.log(tokenValue)
+			// console.log(tokenValue)
 			const tokenDate = tokenValue.createdAt
 			const tokenId = tokenValue.signAt.id
 			if (Date.now() - tokenDate > EXPIRATION_TIME) {
 				res.sendError(403)
 			} else if (Date.now() - tokenDate < VALIDATION_30MINUTES) { /* above 30 mintues, create new token */
-				console.log('passed before 30 minutes')
+				// console.log('passed before 30 minutes')
 				const user = await getUserById(tokenId)
 				req.username = user?.username
-				console.log('ok')
+				// console.log('ok')
 				next()
 			} else {
 				const time = Date.now()
 				const tokenOptions = await getTokenAndOptions(tokenId, time)
 				updateTokenTimeOfUserDB(tokenId, time)
-				console.log('above 30 minutes succeded')
+				// console.log('above 30 minutes succeded')
 				res.cookie('cookieInsta', tokenOptions.token, tokenOptions.options)
 				const user = await getUserById(tokenId)
 				req.username = user?.username
-				console.log('ok')
+				// console.log('ok')
 				next()
 			}
 		}
