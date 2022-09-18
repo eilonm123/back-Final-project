@@ -1,5 +1,5 @@
 import express from 'express'
-import {cors} from 'cors'
+import cors from 'cors'
 import dotenv from 'dotenv'
 import appRouter from './routes'
 import { connectTodb } from './services/db';
@@ -21,8 +21,8 @@ connectTodb()
 
 dotenv.config()
 
-app.listen(process.env.PORT, () => {
-	console.log('listening on port 3000');
+app.listen(process.env.PORT || 3030, () => {
+	console.log(`listening on port ${process.env.PORT || 3030}`);
 })
 
 
