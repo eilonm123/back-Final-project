@@ -27,6 +27,7 @@ async function verifyUser(req: Request, res: Response, next: NextFunction) {
 				const user = await getUserById(tokenId)
 				req.id = user?._id
 				req.username = user?.username
+				req.user = user
 				next()
 			} else {
 				const time = Date.now()
@@ -37,6 +38,7 @@ async function verifyUser(req: Request, res: Response, next: NextFunction) {
 				const user = await getUserById(tokenId)				
 				req.id = user?._id
 				req.username = user?.username
+				req.user = user
 				next()
 			}
 		}

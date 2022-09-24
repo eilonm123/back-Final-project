@@ -28,7 +28,7 @@ router.post('/api/login', login)
 router.post('/api/register', register)
 router.get('/api/user-info',verifyUser, (req, res) => {
     // console.log(req.username)
-    // res.json(req.username)
+    res.json(req.user)
 } )
 
 
