@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 
 
 
+
 const UserSchema = new mongoose.Schema({ // value's first letter must be a capital letter
     firstName: { type: String, required: true, validate: (value: string) => { !value.includes('-') } },
     lastName: { type: String, required: true, validate: (value: string) => { !value.includes('-') } },

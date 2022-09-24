@@ -20,12 +20,16 @@ const router = express.Router()
 
 
 
-
+// router.get('/api', (req,res) => {
+//     res.send('ho ye!')
+//     console.log('yes! api call work')
+// })
 router.post('/api/login', login)
 router.post('/api/register', register)
 router.get('/api/user-info',verifyUser, (req, res) => {
     // console.log(req.username)
-    // res.json(req.username)
+    res.json(req.user)
 } )
+
 
 export default router

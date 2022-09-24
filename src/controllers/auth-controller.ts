@@ -11,12 +11,14 @@ export async function login(req, res) {
     if (!user) {
         res.sendStatus(401)
     }
-    else if(bcrypt.compare(password, user.password)) {
+    else if(await bcrypt.compare(password, user.password)) {
         const tokenDate = new Date().getTime()
         await updateTokenTimeOfUserDB(user._id,tokenDate )
         const tokenAndOptions =  await getTokenAndOptions(user._id, tokenDate)
         res.cookie('cookieInsta', tokenAndOptions.token, tokenAndOptions.options )
         res.send('hello ' + user.username)
+    } else {
+        res.sendStatus(403)
     }}
 
     export async function register(req, res) {

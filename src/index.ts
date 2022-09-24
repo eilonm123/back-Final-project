@@ -5,8 +5,18 @@ import appRouter from './routes'
 import { connectTodb } from './services/db';
 import bcrypt from 'bcrypt'
 import cookieParser  from 'cookie-parser'
+import session from 'express-session'
 const app = express();
-app.use(cors())
+app.use(cors({origin: 'http://localhost:3001',credentials: true}))
+app.use(session({
+    saveUninitialized: false,
+    resave: false,
+    secret: 'very secret 12345',
+    cookie: {
+      secure: false,
+      sameSite: 'none',
+    }}
+))
 app.use(cookieParser())
 app.use(express.json())
 app.use(appRouter)
@@ -25,6 +35,7 @@ app.listen(process.env.PORT || 3030, () => {
 	console.log(`listening on port ${process.env.PORT || 3030}`);
 })
 
+//should the app. listen in try {} and then, catch {process.end() to kill the process}
 
 // function sum(a: number,b: number): number { // the type after the brackets deescribe what the function
 // 	if (a > 5) {
@@ -101,3 +112,5 @@ app.listen(process.env.PORT || 3030, () => {
 // operate({}, Action.UPDATE);
 
 // console.log(sum(3, 1))
+
+
