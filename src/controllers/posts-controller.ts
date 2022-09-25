@@ -1,26 +1,36 @@
 import { PostModel } from '../models/post'
 import { serviceCreatePost, serviceGetFeed } from '../services/post-service'
 import { NextFunction, Request, Response } from 'express'
-// const multer  = require('multer')
+import { validatyeIdLength } from '../middlewares/validatyeIdLength'
+import { notFound } from '../util/users';
 import multer from 'multer'
 
 
 
 
-export async function getPostById(req, res, next) {
-    const postId = await PostModel.findOne({ _id: req.params.postId })
-    if (postId) {
-        req.post = postId
-        next()
-    }
-
-    else {
-        res.send(404)
+export async function getPostById(req: Request, res: Response) {
+    const id = req.params.postId
+    const isValid = validatyeIdLength(id)
+    if (isValid) {
+        const postId = await PostModel.findOne({ _id: id })
+        if (postId) {
+            res.send(postId)
+        } else {
+            return res['send'](`post ${notFound()}`)
+        }
+    } else {
+        res.status(401).send()
     }
 }
 
-export function getPost(req: Express.Request, res: Express.Response) {
-    return res.json(req.post)
+export async function getPosts(req: Request, res: Response) {
+    const id = req.params.postId
+    const posts = await serviceGetFeed()
+    if (posts) {
+        return res.send(posts)
+    } else {
+        return res.send('no posts yet')
+    }
 
 }
 
@@ -65,7 +75,7 @@ export function unlike() {
 
 }
 
-export function addoneMedia(req: Request,res: Response,next: NextFunction) {
+export function addoneMedia(req: Request, res: Response, next: NextFunction) {
     const data = req.body
-    
+
 }

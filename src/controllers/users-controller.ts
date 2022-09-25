@@ -2,21 +2,15 @@ import { serviceGetUsers, serviceGetUserById, serviceUpdateUser, serviceDeleteUs
 import { UserModel } from '../models/user';
 import { verify } from 'jsonwebtoken'
 import { Request, Response } from 'express';
-import { userNotFound } from '../util/users';
+import { notFound } from '../util/users';
 import bcrypt from 'bcrypt'
+import {validatyeIdLength} from '../middlewares/validatyeIdLength'
 
 
 export async function getUsers(req: Request, res: Response) {
     const users = await serviceGetUsers()
     return res.send(users)
 
-}
-export function validatyeIdLength(id: String) {
-    if (id.length == 24) {
-        return true
-    } else {
-        return false
-    }
 }
 
 export async function getUserById(req: Request, res: Response) {
@@ -27,7 +21,7 @@ export async function getUserById(req: Request, res: Response) {
         if (user) {
             return res['send'](user)
         } else {
-            return res['send'](userNotFound())
+            return res['send'](`user ${notFound()}`)
         }
     } else {
         res.status(401).send()

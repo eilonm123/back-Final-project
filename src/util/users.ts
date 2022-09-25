@@ -1,3 +1,3 @@
-export function userNotFound() {
-    return 'user not found'
+export function notFound() {
+    return 'not found'
 }
