@@ -5,6 +5,7 @@ import { UserModel } from '../models/user'
 import { updateTokenTimeOfUserDB, getTokenAndOptions, getUserById } from '../services/auth-service'
 import { NextFunction, Request, Response } from 'express'
 
+
 const VALIDATION_30MINUTES = 1000 * 60 * 30
 const EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 90
 const EXPIRATION_THRESHOLD = EXPIRATION_TIME * 0.75

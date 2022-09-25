@@ -6,6 +6,7 @@ const PostSchema = new mongoose.Schema({ // value's first letter must be a capit
     likes: { type: Number, default: 0},
     caption: {type: String},
     comments: {type: JSON},
+    mediaUrl: {type: String}
 })
 
 export const PostModel = mongoose.model('Post', PostSchema) // you have to put a capital letter in the first parameter
