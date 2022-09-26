@@ -33,6 +33,22 @@ export async function getPost(req: Request, res: Response) {
 
 }
 
+export async function createProfilePicture(req: request, res: Response) {
+    try {
+        if (req.file.mimetype !== 'image/jpeg' && req.file.mimetype !== 'image/jpg') {
+            res.send('please upload a file with extention of jpeg')
+        } else {
+            let { path: media } = req.file
+            const updatedMedia = media.replace('\\', '/') // trying to save it not as : uploads\\1664182746286-DoReMi.jpg
+            const postData = { media, body, author }
+            const post = await serviceCreatePost(postData)
+            console.log(req.file.mimetype)
+            res.send(post)
+        }
+    } catch {
+        res.send('image required')
+    }
+}
 
 export async function createPost(req: Request, res: Response) {
     const { body } = req.body
@@ -40,56 +56,59 @@ export async function createPost(req: Request, res: Response) {
     if (!author) {
         res.send('not authorized')
     }
-    if (body) {
+    if (!body) {
+        res.send('body required')
+    } else {
         try {
-            if (req.file.mimetype !== 'image/jpeg' && req.file.mimetype !== 'image/jpg') { 
-                res.send('please upload a file with extention of jpeg')
-            } else {
-                let { path: media } = req.file
-                const updatedMedia = media.replace('\\', '/') // trying to save it not as : uploads\\1664182746286-DoReMi.jpg
-                const postData = { media, body, author }
-                const post = await serviceCreatePost(postData)
-                console.log(req.file.mimetype)
-                res.send(post)
+            const files = req.files
+            if (!files.length) {
+                res.send('has to attached files')
             }
+            const mediaList = files.map((file) => {
+                if (file.mimetype !== 'image/jpeg' && file.mimetype !== 'image/jpg') {
+                    res.send('please upload a file with extention of jpeg or jpg')
+                } else {
+                    let { path: media } = file
+                    return media
+                }
+            })
+            const postData = { mediaList, body, author }
+            const post = await serviceCreatePost(postData)
+            res.send(post)
+
+
+
         } catch {
             res.send('image or video are required')
         }
-    } else {
-        res.send('body required')
     }
-    // try {
-    //     const { path: media } = req.file
-    //     const postData = { media, body, author }
-    // } catch {
-    //     let postData = { body, author }
-    // }
-    //  else {
-    //         if (body) {
-    //             const post = await serviceCreatePost(postData)
-    //             res.send(post)
-    //         } else {
-    //             res.send('body required')
-    //         }
-    //     }
-    // console.log(req.file.mimetype)
-    // const username = req.username
-    // const postData = req['body']
-    // console.log(`post is ${postData}`)
-    // if (postData.body.length) {
-    // const post = await serviceCreatePost(postData)
-    //     return res['json'](post)
-    // }
-
-
-
-    // author: {type: String, ref:"User", required: true, index: true},
-    // body: { type: String, required: true, validate: (value) => { value.length > 0 } },
-    // likes: { type: Number, default: 0},
-    // caption: {type: String},
-    // comments: {type: JSON},
-
 }
+
+// export async function createPost(req: Request, res: Response) {
+//     const { body } = req.body
+//     const author = req.username
+//     if (!author) {
+//         res.send('not authorized')
+//     }
+//     if (body) {
+//         try {
+//             if (req.file.mimetype !== 'image/jpeg' && req.file.mimetype !== 'image/jpg') { 
+//                 res.send('please upload a file with extention of jpeg')
+//             } else {
+//                 let { path: media } = req.file
+//                 const updatedMedia = media.replace('\\', '/') // trying to save it not as : uploads\\1664182746286-DoReMi.jpg
+//                 const postData = { media, body, author }
+//                 const post = await serviceCreatePost(postData)
+//                 console.log(req.file.mimetype)
+//                 res.send(post)
+//             }
+//         } catch {
+//             res.send('image or video are required')
+//         }
+//     } else {
+//         res.send('body required')
+//     }
+// }
 
 export async function getFeed(req, res) {
     const id = req.params.postId

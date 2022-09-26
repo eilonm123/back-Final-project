@@ -3,7 +3,7 @@ import { PostModel } from '../models/post'
 
 interface IPost {
     author: String;
-    image?: String;
+    mediaList: String[];
     body: String;
     caption?: String;
 }

@@ -15,7 +15,7 @@ router.get('/api/feed', getFeed)
 router.get('/api/posts/:postId',getPostById, getPost)
 router.get('/api/posts/:postId/comments',getPostById, getPostComments) // if postId dont shown as query how to pass the middleware an id?
 router.get('/api/posts/:postId/likes',getPostById, getPostLikes)
-router.post('/api/posts', upload.single('media'), createPost)
+router.post('/api/posts', upload.array('media', 3), createPost)
 router.post('/api/posts/singleMedia', upload.single('media'), (req,res)=>{
 	console.log(`details: ${req.file}`)
 })
