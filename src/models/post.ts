@@ -6,7 +6,8 @@ const PostSchema = new mongoose.Schema({ // value's first letter must be a capit
     likes: { type: Number, default: 0},
     caption: {type: String},
     comments: {type: JSON},
-    mediaUrl: {type: String}
+    media: {type: String} // why is saves the image url like that : uploads\\1664182176402-DoReMi.jpg ( two \\) 
+
 })
 
 export const PostModel = mongoose.model('Post', PostSchema) // you have to put a capital letter in the first parameter

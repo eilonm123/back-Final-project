@@ -2,7 +2,7 @@ import { serviceGetUsers, serviceGetUserById, serviceUpdateUser, serviceDeleteUs
 import { UserModel } from '../models/user';
 import { verify } from 'jsonwebtoken'
 import { Request, Response } from 'express';
-import { notFound } from '../util/users';
+import { notFound } from '../util/usersPosts';
 import bcrypt from 'bcrypt'
 import {validatyeIdLength} from '../middlewares/validatyeIdLength'
 
