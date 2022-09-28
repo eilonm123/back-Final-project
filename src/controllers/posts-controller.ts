@@ -40,10 +40,10 @@ export async function createProfilePicture(req: request, res: Response) {
         } else {
             let { path: media } = req.file
             const updatedMedia = media.replace('\\', '/') // trying to save it not as : uploads\\1664182746286-DoReMi.jpg
-            const postData = { media, body, author }
-            const post = await serviceCreatePost(postData)
-            console.log(req.file.mimetype)
-            res.send(post)
+            // const postData = { media, body, author }
+            // const post = await serviceCreatePost(postData)
+            // console.log(req.file.mimetype)
+            // res.send(post)
         }
     } catch {
         res.send('image required')
@@ -111,7 +111,6 @@ export async function createPost(req: Request, res: Response) {
 // }
 
 export async function getFeed(req, res) {
-    const id = req.params.postId
     const posts = await serviceGetFeed()
     if (posts) {
         return res.send(posts)
@@ -136,7 +135,4 @@ export function unlike() {
 
 }
 
-export function addoneMedia(req: Request, res: Response, next: NextFunction) {
-    const data = req.body
 
-}

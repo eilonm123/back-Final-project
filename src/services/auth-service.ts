@@ -10,8 +10,8 @@ export async function createUser(user: any = {}) {
 	try {
 		// console.log(user)
 		const newUser = new UserModel({
-			firstName: user.firstName,
-			lastName: user.lastName,
+			fullname: user.fullname,
+			// lastName: user.lastName,
 			username: user.username,
 			password: user.password,
 			email: user.email
