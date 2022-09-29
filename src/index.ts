@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt'
 import cookieParser  from 'cookie-parser'
 import session from 'express-session'
 const app = express();
+
 app.use(cors({origin: 'http://localhost:3001',credentials: true}))
 app.use(session({
     saveUninitialized: false,
@@ -19,6 +20,7 @@ app.use(session({
 ))
 app.use(cookieParser())
 app.use(express.json())
+app.use('/uploads', express.static('./uploads'))
 app.use(appRouter)
 
 // async function fetchSalt() {
@@ -27,13 +29,18 @@ app.use(appRouter)
 // }
 // fetchSalt()
 
-connectTodb() 
+connectTodb()
+.then(()=>{
+  app.listen(process.env.PORT || 3030, () => {
+    console.log(`listening on port ${process.env.PORT || 3030}`);
+  })
+})
 
 dotenv.config()
 
-app.listen(process.env.PORT || 3030, () => {
-	console.log(`listening on port ${process.env.PORT || 3030}`);
-})
+// app.listen(process.env.PORT || 3030, () => {
+// 	console.log(`listening on port ${process.env.PORT || 3030}`);
+// })
 
 //should the app. listen in try {} and then, catch {process.end() to kill the process}
 

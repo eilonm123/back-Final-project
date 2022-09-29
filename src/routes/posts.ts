@@ -11,6 +11,7 @@ function sendResponse(req, res) {
 
 router.use(verifyUser)
 
+
 router.get('/api/feed', getFeed)
 router.get('/api/posts/:postId',getPostById, getPost)
 router.get('/api/posts/:postId/comments',getPostById, getPostComments) // if postId dont shown as query how to pass the middleware an id?

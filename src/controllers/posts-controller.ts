@@ -111,8 +111,13 @@ export async function createPost(req: Request, res: Response) {
 // }
 
 export async function getFeed(req, res) {
+    const page = req.query.page
+    const limit = req.query.limit
+    const startIndex = (page-1) * limit
+    const endIndex = page * limit
     const posts = await serviceGetFeed()
     if (posts) {
+        const slicedPosts = posts.slice(startIndex, endIndex)
         return res.send(posts)
     } else {
         return res.send('no posts yet')
