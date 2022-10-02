@@ -1,20 +1,31 @@
 import { PostModel } from '../models/post'
 
 
-export async function serviceCreatePost(postData: any = {}, username: String) {
-    const newPost = await PostModel.create(postData, username)
-    console.log(newPost)
+interface IPost {
+    author: String;
+    mediaList: String[];
+    body: String;
+    caption?: String;
 }
 
-export async function serviceGetFeed() {
-    const allPosts = await PostModel.find({})
+
+export async function serviceCreatePost(postData: IPost) {
+    const newPost = await PostModel.create(postData)
+    return newPost
+}
+
+export async function serviceGetFeed(offset = 0, limit = 5) {
+    const allPosts = await PostModel.find({}).sort({created: -1}).skip(offset).limit(limit)
     return allPosts
 }
 
-// const PostSchema = new mongoose.Schema({ // value's first letter must be a capital letter
-//     author: {type: String, ref:"User", required: true, index: true},
-//     body: { type: String, required: true, validate: (value) => { value.length > 0 } },
-//     likes: { type: Number, default: 0},
-//     caption: {type: String},
-//     comments: {type: JSON},
-// })
+export async function serviceGetPost(id) {
+    const post = await PostModel.findOne({_id: id})
+    return post
+}
+
+export async function serviceGetPostsByUsername(username){
+    const allPosts = await PostModel.find({author: username})
+    return allPosts
+}
+

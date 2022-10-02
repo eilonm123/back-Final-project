@@ -10,6 +10,11 @@ export async function serviceGetUserById(id) {
     return user
 }
 
+export async function serviceGetUserByUsername(username) {
+    const user = await UserModel.findOne({ username: username })
+    return user
+}
+
 export async function serviceUpdateUser(id, prop: String, value) {
     const user = await UserModel.findOneAndUpdate({ _id: id }, { $set: { [prop]: value } }, {
         new: true

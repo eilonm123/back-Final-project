@@ -16,7 +16,7 @@ export async function login(req, res) {
         await updateTokenTimeOfUserDB(user._id,tokenDate )
         const tokenAndOptions =  await getTokenAndOptions(user._id, tokenDate)
         res.cookie('cookieInsta', tokenAndOptions.token, tokenAndOptions.options )
-        res.send('hello ' + user.username)
+        res.send(user.username)
     } else {
         res.sendStatus(403)
     }}

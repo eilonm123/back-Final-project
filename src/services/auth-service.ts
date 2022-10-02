@@ -10,8 +10,8 @@ export async function createUser(user: any = {}) {
 	try {
 		// console.log(user)
 		const newUser = new UserModel({
-			firstName: user.firstName,
-			lastName: user.lastName,
+			fullname: user.fullname,
+			// lastName: user.lastName,
 			username: user.username,
 			password: user.password,
 			email: user.email
@@ -51,7 +51,6 @@ export async function getUserByUsernameAndPassword(username, password) {
 
 export async function updateTokenTimeOfUserDB(id, date) {
 	const user = await UserModel.findOneAndUpdate({_id: id}, {tokenCreatedAt: date}, {new: true} )
-	console.log(user)
 	return user
 }
 
