@@ -14,13 +14,18 @@ export async function serviceCreatePost(postData: IPost) {
     return newPost
 }
 
-export async function serviceGetFeed() {
-    const allPosts = await PostModel.find({})
+export async function serviceGetFeed(offset = 0, limit = 5) {
+    const allPosts = await PostModel.find({}).sort({created: -1}).skip(offset).limit(limit)
     return allPosts
 }
 
 export async function serviceGetPost(id) {
     const post = await PostModel.findOne({_id: id})
     return post
+}
+
+export async function serviceGetPostsByUsername(username){
+    const allPosts = await PostModel.find({author: username})
+    return allPosts
 }
 

@@ -1,12 +1,12 @@
 import { PostModel } from '../models/post'
-import { serviceCreatePost, serviceGetFeed, serviceGetPost } from '../services/post-service'
+import { serviceCreatePost, serviceGetFeed, serviceGetPost, serviceGetPostsByUsername } from '../services/post-service'
 import { NextFunction, Request, Response } from 'express'
 import { validatyeIdLength } from '../middlewares/validatyeIdLength'
 import { notFound } from '../util/usersPosts';
 import { idLengthError } from '../util/id'
 import multer from 'multer'
 
-
+const PAGE_LIMIT = 5
 
 
 export async function getPostById(req: Request, res: Response, next: NextFunction) {
@@ -21,7 +21,21 @@ export async function getPostById(req: Request, res: Response, next: NextFunctio
     }
 }
 
-export async function getPost(req: Request, res: Response) {
+export async function getPostsByUsername(req: Request, res: Response) {
+    console.log('get in here')
+    const username = req.params.username
+    console.log(username)
+    const posts = await serviceGetPostsByUsername(username)
+    if (posts) {
+        res.send(posts)
+    } else {
+        res.send(`post ${notFound()}`)
+    }
+
+
+}
+
+export async function getPostsOfUser(req: Request, res: Response) {
     const postId = req.postId
     const post = await serviceGetPost(postId)
     if (post) {
@@ -111,18 +125,30 @@ export async function createPost(req: Request, res: Response) {
 // }
 
 export async function getFeed(req, res) {
-    const page = req.query.page
-    const limit = req.query.limit
-    const startIndex = (page-1) * limit
-    const endIndex = page * limit
-    const posts = await serviceGetFeed()
-    if (posts) {
-        const slicedPosts = posts.slice(startIndex, endIndex)
-        return res.send(posts)
-    } else {
-        return res.send('no posts yet')
-    }
+    const page = parseInt(req.query.page) || 0
+    const limit = parseInt(req.query.limit) || 5
+    const offset = page * PAGE_LIMIT
+
+    const posts = await serviceGetFeed(offset, limit)
+    const listOfModifiedMediaList = posts.map((post) => {
+          return post.mediaList.map((url) => {
+             return url.replaceAll('\\', '/')
+        })
+    })
+    // const updatedPosts = posts.map((post, index)=>{
+    //     post.mediaList = listOfModifiedMediaList[index]
+    //     return post
+    // })
+
+    // if (listOfModifiedMediaList) {
+        
+    //     return res.send(listOfModifiedMediaList)
+    // } else {
+    //     return res.send('no posts yet')
+    // }
+    res.json(posts)
 }
+
 
 export function getPostComments() {
 

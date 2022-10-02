@@ -1,10 +1,10 @@
-import { serviceGetUsers, serviceGetUserById, serviceUpdateUser, serviceDeleteUser } from '../services/users-service';
+import { serviceGetUsers, serviceGetUserById, serviceUpdateUser, serviceDeleteUser, serviceGetUserByUsername } from '../services/users-service';
 import { UserModel } from '../models/user';
 import { verify } from 'jsonwebtoken'
 import { Request, Response } from 'express';
 import { notFound } from '../util/usersPosts';
 import bcrypt from 'bcrypt'
-import {validatyeIdLength} from '../middlewares/validatyeIdLength'
+import { validatyeIdLength } from '../middlewares/validatyeIdLength'
 
 
 export async function getUsers(req: Request, res: Response) {
@@ -14,7 +14,7 @@ export async function getUsers(req: Request, res: Response) {
 }
 
 export async function getUserById(req: Request, res: Response) {
-    const id = req.params.username
+    const id = req.params.id
     const isValid = validatyeIdLength(id)
     if (isValid) {
         const user = await serviceGetUserById(id)
@@ -25,6 +25,19 @@ export async function getUserById(req: Request, res: Response) {
         }
     } else {
         res.status(401).send()
+    }
+
+
+}
+export async function getUserByUsername(req: Request, res: Response) {
+    const username = req.params.username
+    const user = await serviceGetUserByUsername(username)
+    if (user) {
+        return res.send({username: user.username, email: user.email, following: user.following})
+    } else {
+        // res.send()
+        res.status(401).send()
+        
     }
 
 
@@ -129,12 +142,12 @@ export async function follow(req: Request, res: Response) { // using graph QL: (
     const isValidId = validatyeIdLength(req.id)
     if (isValidId) {
         const user = await serviceGetUserById(req.id)
-        const {id, value} = req.body
+        const { id, value } = req.body
         if (id === 'id') {
             if (validatyeIdLength(value)) {
-    
+
             } else {
-    
+
             }
         }
     }
