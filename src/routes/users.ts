@@ -1,7 +1,8 @@
 import express from 'express'
 import appRouter from '.'
 import verifyUser from '../middlewares/verify-user'
-import {getUserById,getUsers,updateUser,deleteUser, follow, validatePropsToUpdate, getUserByUsername} from '../controllers/users-controller'
+import {getUserById,getUsers,updateUser,deleteUser, follow, validatePropsToUpdate, getUserByUsername, createUser} from '../controllers/users-controller'
+import { createPost } from '../controllers/posts-controller'
 
 
 const router = express.Router()
@@ -12,6 +13,7 @@ const router = express.Router()
 
 router.use(verifyUser)
 
+router.post('/api/user', createUser)
 router.get('/api/users/:username', getUserByUsername)
 router.get('/api/users/:id', getUserById)
 router.get('/api/users', getUsers)

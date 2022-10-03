@@ -1,0 +1,16 @@
+import {createError} from './Errors'
+
+const password = createError("password must contains 8 characters long")
+const username = createError("please provide a username with at leasr 4 characters")
+const email = createError("email must contains '@'")
+const fullname = createError("fullname must contains at least one space")
+
+
+
+export const Errors = {
+    password,
+    username,
+    email,
+    fullname
+}
+

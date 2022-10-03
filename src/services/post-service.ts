@@ -1,8 +1,9 @@
 import { PostModel } from '../models/post'
+import { Types } from 'mongoose'
 
 
 interface IPost {
-    author: String;
+    author: Types.ObjectId;
     mediaList: String[];
     body: String;
     caption?: String;
@@ -24,8 +25,8 @@ export async function serviceGetPost(id) {
     return post
 }
 
-export async function serviceGetPostsByUsername(username){
-    const allPosts = await PostModel.find({author: username})
+export async function serviceGetPostsByUsername(username: string){
+    const allPosts = await PostModel.find({}).populate("author")
     return allPosts
 }
 

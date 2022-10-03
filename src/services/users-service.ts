@@ -27,4 +27,25 @@ export async function serviceDeleteUser(id) {
     return user
 }
 
+export async function serviceCreateUser(user: any = {}) {
+	if (!user.username) {
+		throw new Error('username is required');
+	}
+	try {
+		// console.log(user)
+		const newUser = new UserModel({
+			fullname: user.fullname,
+			username: user.username,
+			password: user.password,
+			email: user.email
+		});
+		await newUser.save() // למה לא מצליח לשמור וקודם כן
+		return newUser;
+	}
+	catch(err) {
+		console.log(err)
+		throw new Error(err)
+	}
+}
+
 // serviceGetFollowing

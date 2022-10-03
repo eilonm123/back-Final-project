@@ -22,30 +22,20 @@ export async function getPostById(req: Request, res: Response, next: NextFunctio
 }
 
 export async function getPostsByUsername(req: Request, res: Response) {
-    console.log('get in here')
     const username = req.params.username
     console.log(username)
     const posts = await serviceGetPostsByUsername(username)
     if (posts) {
         res.send(posts)
     } else {
+        console.log('no posts yet')
         res.send(`post ${notFound()}`)
     }
 
 
 }
 
-export async function getPostsOfUser(req: Request, res: Response) {
-    const postId = req.postId
-    const post = await serviceGetPost(postId)
-    if (post) {
-        res.send(post)
-    } else {
-        res.send(`post ${notFound()}`)
-    }
 
-
-}
 
 export async function createProfilePicture(req: request, res: Response) {
     try {
@@ -66,7 +56,7 @@ export async function createProfilePicture(req: request, res: Response) {
 
 export async function createPost(req: Request, res: Response) {
     const { body } = req.body
-    const author = req.username
+    const author = req.id
     if (!author) {
         res.send('not authorized')
     }

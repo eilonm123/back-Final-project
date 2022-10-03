@@ -1,10 +1,11 @@
-import { serviceGetUsers, serviceGetUserById, serviceUpdateUser, serviceDeleteUser, serviceGetUserByUsername } from '../services/users-service';
+import { serviceGetUsers, serviceGetUserById, serviceUpdateUser, serviceDeleteUser, serviceGetUserByUsername, serviceCreateUser } from '../services/users-service';
 import { UserModel } from '../models/user';
 import { verify } from 'jsonwebtoken'
 import { Request, Response } from 'express';
 import { notFound } from '../util/usersPosts';
 import bcrypt from 'bcrypt'
 import { validatyeIdLength } from '../middlewares/validatyeIdLength'
+import { Errors } from '../util/createUserErrors'
 
 
 export async function getUsers(req: Request, res: Response) {
@@ -12,6 +13,80 @@ export async function getUsers(req: Request, res: Response) {
     return res.send(users)
 
 }
+
+function validateBody(obj) {
+    const fieldsArray = Object.keys(obj)
+    const errors = fieldsArray.reduce((errorsArray, field) => {
+        if (field === 'username') {
+            if (obj[field].length <= 4) {
+                errorsArray.push(Errors.username)
+            }
+        } 
+        if (field === 'fullname') {
+            if (!obj[field].includes(' ')) {
+                errorsArray.push(Errors.fullname)
+            }
+        }
+        if (field === 'password') {
+            if (obj[field].length < 8) {
+                errorsArray.push(Errors.password)
+            }
+        }
+        if (field === 'email') {
+            if (!obj[field].includes('@')) {
+                errorsArray.push(Errors.email)
+            }
+        }
+        return errorsArray
+    }, [])
+    return errors
+}
+
+export async function createUser(req: Request, res: Response) {
+    const { email, username, password, fullname } = req.body
+    const body = [email, username, password, fullname]
+    const result = validateBody(req.body)
+    if (result.length === 0) {
+        const user = serviceCreateUser(req.body)
+        if (user) {
+            return res.send(user)
+        }
+        
+    }
+    console.log(result)
+
+
+
+}
+
+// EmptyEmailForCreateUser,
+//     EmptyPasswordAndEmailForCreateUser,
+//     EmptyUsernameAndEmailForCreateUser,
+//     EmptyFullnameAndEmailForCreateUser
+
+/* 
+email && !username && !password && !fullname
+email &&  username && !password && !fullname
+email && !username && password && !fullname
+!email && username && password && !fullname
+
+
+
+email && username && !password && fullname
+email && username && !password && fullname
+
+
+
+
+email && username && !password && fullname
+
+
+
+email && username && !password && fullname
+
+*/
+
+
 
 export async function getUserById(req: Request, res: Response) {
     const id = req.params.id
@@ -33,11 +108,11 @@ export async function getUserByUsername(req: Request, res: Response) {
     const username = req.params.username
     const user = await serviceGetUserByUsername(username)
     if (user) {
-        return res.send({username: user.username, email: user.email, following: user.following})
+        return res.send({ username: user.username, email: user.email, following: user.following })
     } else {
         // res.send()
         res.status(401).send()
-        
+
     }
 
 

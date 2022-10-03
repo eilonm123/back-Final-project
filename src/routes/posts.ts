@@ -13,6 +13,8 @@ router.use(verifyUser)
 
 
 router.get('/api/feed', getFeed)
+
+// api/posts/1234534FGSDGZ3s#zs
 router.get('/api/posts/:username', getPostsByUsername)
 router.get('/api/posts/:postId',getPostById)
 router.get('/api/posts/:postId/comments',getPostById, getPostComments) // if postId dont shown as query how to pass the middleware an id?

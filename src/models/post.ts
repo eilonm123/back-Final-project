@@ -7,7 +7,7 @@ const PostSchema = new mongoose.Schema({ // value's first letter must be a capit
     caption: {type: String},
     comments: {type: JSON},
     mediaList: {type: []}, // why is saves the image url like that : uploads\\1664182176402-DoReMi.jpg ( two \\) 
-    created: { type: Date, default: Date.now },
+    created: { type: Date, default: Date.now }
 
 })
 
