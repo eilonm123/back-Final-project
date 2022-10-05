@@ -45,6 +45,7 @@ async function verifyUser(req: Request, res: Response, next: NextFunction) {
 		}
 		catch {
 			console.log('verification failed', req.cookies)
+			console.log(res.cookies)
 			res.status(401).json({ message: 'you are not authorized' })
 		}
 	}

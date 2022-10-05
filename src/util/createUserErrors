@@ -1,16 +1,20 @@
 import {createError} from './Errors'
 
 const password = createError("password must contains 8 characters long")
-const username = createError("please provide a username with at leasr 4 characters")
+const usernameLength = createError("please provide a username with at leasr 4 characters")
+const usernameExists = createError("username already exists")
 const email = createError("email must contains '@'")
 const fullname = createError("fullname must contains at least one space")
+const invalidProp = createError("the prop you trying to update does'nt exists")
 
 
 
 export const Errors = {
     password,
-    username,
+    usernameLength,
     email,
-    fullname
+    fullname,
+    invalidProp,
+    usernameExists
 }
 

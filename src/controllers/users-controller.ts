@@ -14,15 +14,17 @@ export async function getUsers(req: Request, res: Response) {
 
 }
 
-function validateBody(obj) {
+async function validateBodyUser(obj) {
     const fieldsArray = Object.keys(obj)
     const errors = fieldsArray.reduce((errorsArray, field) => {
+        if (field !== 'username' && field !== 'fullname' && field !== 'password' && field !== 'email') {
+            errorsArray.push(Errors.invalidProp)
+        }
         if (field === 'username') {
             if (obj[field].length <= 4) {
-                errorsArray.push(Errors.username)
+                errorsArray.push(Errors.usernameLength)
             }
-        } 
-        if (field === 'fullname') {
+        } else if (field === 'fullname') {
             if (!obj[field].includes(' ')) {
                 errorsArray.push(Errors.fullname)
             }
@@ -30,11 +32,12 @@ function validateBody(obj) {
         if (field === 'password') {
             if (obj[field].length < 8) {
                 errorsArray.push(Errors.password)
+
             }
-        }
-        if (field === 'email') {
+        } else if (field === 'email') {
             if (!obj[field].includes('@')) {
                 errorsArray.push(Errors.email)
+
             }
         }
         return errorsArray
@@ -42,54 +45,34 @@ function validateBody(obj) {
     return errors
 }
 
+
 export async function createUser(req: Request, res: Response) {
     const { email, username, password, fullname } = req.body
-    const body = [email, username, password, fullname]
-    const result = validateBody(req.body)
-    if (result.length === 0) {
-        const user = serviceCreateUser(req.body)
-        if (user) {
-            return res.send(user)
+    if (email && username && password && fullname) {
+        const usernameExists = serviceGetUserByUsername(username)
+        if (!usernameExists) {
+            const result = await validateBodyUser(req.body)
+            if (result.length === 0) {
+                const user = await serviceCreateUser(req.body)
+                if (user) {
+                    res.send(user)
+                }
+            } else {
+                res.send(result)
+            }
+        } else {
+            res.send('username already Exists. choose different one')
         }
-        
+    } else {
+        res.send('dont manipulate me')
     }
-    console.log(result)
-
-
 
 }
 
-// EmptyEmailForCreateUser,
-//     EmptyPasswordAndEmailForCreateUser,
-//     EmptyUsernameAndEmailForCreateUser,
-//     EmptyFullnameAndEmailForCreateUser
-
-/* 
-email && !username && !password && !fullname
-email &&  username && !password && !fullname
-email && !username && password && !fullname
-!email && username && password && !fullname
-
-
-
-email && username && !password && fullname
-email && username && !password && fullname
-
-
-
-
-email && username && !password && fullname
-
-
-
-email && username && !password && fullname
-
-*/
-
-
-
 export async function getUserById(req: Request, res: Response) {
-    const id = req.params.id
+    const id = req.params.userId
+    console.log('working')
+    console.log(id)
     const isValid = validatyeIdLength(id)
     if (isValid) {
         const user = await serviceGetUserById(id)
@@ -118,83 +101,52 @@ export async function getUserByUsername(req: Request, res: Response) {
 
 }
 
-export async function validatePropsToUpdate(id, prop, value) {
-    if (!validatyeIdLength(id)) {
-        // console.log(id)
-        // throw new Error('id must be 24 characters')
-    } else {
-        if (prop === 'password') {
-            const salt = await bcrypt.genSalt(10)
-            const hashedPassword = await bcrypt.hash(value, salt)
-            return [prop, value]
-        } else if (prop === 'username') {
-            if (value.length >= 4) {
-                return [prop, value]
-            } else {
-                return 'value must be more than 3 characters'
-            }
-        } else if (prop === 'email') {
-            if (value.includes('@')) {
-                return [prop, value]
-            } else {
-                return 'email must contain @'
-            }
-        } else if (prop === 'firstName' || prop === 'lastName') {
-            return [prop, value]
-        } else {
-            return 'prop must be: firstName / lastName / username / password / email' // catch{res.status(400).send(err.message)}
-        }
-    }
-}
+
 
 export async function updateUser(req: Request, res: Response) { // go to auth flow
-    const id = req.id
-    try {
-        const bodySplitted = Object.entries(req.body) // newProp: %@^*D#X
-        const [prop, value] = bodySplitted[0]
-        const validationResult = await validatePropsToUpdate(id, prop, value)
-        if (typeof (validationResult) === 'object') {
-            const updatedUser = await serviceUpdateUser(id, prop, value)
-            await updatedUser.save()
-            res.send(updatedUser)
+    const idParams = req.params.userId
+    const idVerify = req.id.valueOf()
+    if (idParams === idVerify) {
+        const errors = await validateBodyUser(req.body)   /* { [name]: name, [genre]: genre, "author": author, "similar": similar} */
+        if (!errors.length) {
+            const body = req.body
+            const bodyList = Object.entries(body)
+            // console.log(bodyList) /* [ [ 'password', '123456789' ], [ 'username', 'shakshuuu' ] ] */
+            const result = {}
+            bodyList.forEach((pair) => {
+                const key = pair[0]
+                const value = pair[1]
+                result[key] = value
+            })
+            const updatedUser = await serviceUpdateUser(idVerify, result)
+            if (updatedUser) {
+                res.send(updatedUser)
+            }
         } else {
-            res.send(validationResult)
+            res.send(errors)
         }
-
-    } catch {
-        res.send('send information')
     }
-
-    // if (!validatyeIdLength(id)) {
-    //     res['send']('id too long. need to be 24') // res.send(new Error.IdError) - utilez
-    // } else {
-    //     const bodySplitted = Object.entries(req.body) // newProp: %@^*D#X
-    //     const [prop, value] = bodySplitted[0]
-    //     if (prop === 'firstName' || prop === 'lastName' || (prop === 'username' && prop.length > 4) || prop === 'password' || prop === 'email') {
-    //         const updatedUser = await serviceUpdateUser(id, prop, value)
-    //         if (updatedUser) {
-    //             res.send(updatedUser)
-    //         } else {
-    //             res.send(userNotFound())
-    //         }
-    //     } else {
-    //         throw new Error('cant exccess DB')
-    //     }
-    // }
 }
 
 export async function deleteUser(req: Request, res: Response) { // כאן הבאתי יוזר ניים מהפרמס
-    const id = req['params'].username /* gives an id */
+    const idParams = req.params.userId /* gives an id */
     // TODO: only the current user can delete its own!
-    if (!validatyeIdLength(id)) {
-        res['send']('id too long. need to be 24')
-    } else {
-        const user = await serviceDeleteUser(id)
-        if (user) {
-            res.send(user)
+    const idVerify = req.id.valueOf()
+    console.log(idVerify)
+    console.log(idParams)
+    if (idVerify === idParams) {
+        if (!validatyeIdLength(idVerify)) {
+            res['send']('id too long. need to be 24')
         } else {
-            res.send()
+            const user = await serviceDeleteUser(idVerify)
+            if (user) {
+                res.send(user)
+            } else {
+                res.send('user hasnt found')
+            }
         }
+    } else {
+        res.send('cant remove user who isnt you')
     }
 }
 
