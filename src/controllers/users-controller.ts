@@ -14,9 +14,10 @@ export async function getUsers(req: Request, res: Response) {
 
 }
 
-async function validateBodyUser(obj) {
+export function validateBodyUser(obj) {
     const fieldsArray = Object.keys(obj)
     const errors = fieldsArray.reduce((errorsArray, field) => {
+        console.log(errorsArray)
         if (field !== 'username' && field !== 'fullname' && field !== 'password' && field !== 'email') {
             errorsArray.push(Errors.invalidProp)
         }
@@ -51,7 +52,7 @@ export async function createUser(req: Request, res: Response) {
     if (email && username && password && fullname) {
         const usernameExists = serviceGetUserByUsername(username)
         if (!usernameExists) {
-            const result = await validateBodyUser(req.body)
+            const result = validateBodyUser(req.body)
             if (result.length === 0) {
                 const user = await serviceCreateUser(req.body)
                 if (user) {
@@ -64,7 +65,7 @@ export async function createUser(req: Request, res: Response) {
             res.send('username already Exists. choose different one')
         }
     } else {
-        res.send('dont manipulate me')
+        res.send(Errors.missedFields)
     }
 
 }
@@ -107,7 +108,7 @@ export async function updateUser(req: Request, res: Response) { // go to auth fl
     const idParams = req.params.userId
     const idVerify = req.id.valueOf()
     if (idParams === idVerify) {
-        const errors = await validateBodyUser(req.body)   /* { [name]: name, [genre]: genre, "author": author, "similar": similar} */
+        const errors = validateBodyUser(req.body)   /* { [name]: name, [genre]: genre, "author": author, "similar": similar} */
         if (!errors.length) {
             const body = req.body
             const bodyList = Object.entries(body)
