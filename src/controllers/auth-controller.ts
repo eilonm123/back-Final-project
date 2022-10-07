@@ -3,16 +3,16 @@ import { verify, sign } from 'jsonwebtoken'
 import { getUserByUsername, getUserByUsernameAndPassword, createUser, updateTokenTimeOfUserDB, getTokenAndOptions } from '../services/auth-service';
 import bcrypt from 'bcrypt'
 import { cookieParser, cookie } from 'cookie-parser'
-import { createError, Errors } from '../util/UserErrors';
+import { Errors } from '../util/UserErrors';
 import { validateBodyUser } from './users-controller'
 
-function validateBodyLogin(obj) {
+function validateBodyLogin(obj: Record<string, string>) {
     const { username, password } = obj
     if (!username || !password) {
         return Errors.FailedLoginError
     }
     const props = Object.entries(obj)
-    const errors = props.reduce((errorsList: object[], pair) => {
+    const errors = props.reduce((errorsList: object[], pair: string[]) => {
         console.log(pair)
         const field: string = pair[0]
         const value = pair[1]
@@ -65,7 +65,7 @@ export async function register(req, res) {
         return res.send(Errors.missedFields)
     }
     const errors = validateBodyUser(req.body)
-    if (errors) {
+    if (errors.length) {
         console.log('why')
         console.log(errors)
         return res.send(errors)

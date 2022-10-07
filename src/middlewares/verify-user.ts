@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt'
 import { UserModel } from '../models/user'
 import { updateTokenTimeOfUserDB, getTokenAndOptions, getUserById } from '../services/auth-service'
 import { NextFunction, Request, Response } from 'express'
+import { MyRequest } from '../types'
+import { Errors } from '../util/UserErrors'
 
 
 const VALIDATION_30MINUTES = 1000 * 60 * 30
@@ -51,7 +53,7 @@ const EXPIRATION_THRESHOLD = EXPIRATION_TIME * 0.75
 // }
 
 
-async function verifyUser(req: Request, res: Response, next: NextFunction) {
+async function verifyUser(req: MyRequest, res: Response, next: NextFunction) {
 	const token = req.cookies['cookieInsta']  /* token return "createdAt" (date) and "signAt" (id) */
 	if (!token) {
 		// console.log('no token', token, req.cookies['cookieInsta'])
