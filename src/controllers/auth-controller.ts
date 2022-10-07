@@ -3,36 +3,37 @@ import { verify, sign } from 'jsonwebtoken'
 import { getUserByUsername, getUserByUsernameAndPassword, createUser, updateTokenTimeOfUserDB, getTokenAndOptions } from '../services/auth-service';
 import bcrypt from 'bcrypt'
 import { cookieParser, cookie } from 'cookie-parser'
-import { createError, Errors } from '../util/createUserErrors';
+import { createError, Errors } from '../util/UserErrors';
 import { validateBodyUser } from './users-controller'
 
 function validateBodyLogin(obj) {
     const { username, password } = obj
-    if (username && password) {
-        const props = Object.entries(obj)
-        const errors = props.reduce((errorsList, pair) => {
-            const field = pair[0]
-            const value = pair[1]
-            if (field !== 'username' && field !== 'fullname' && field !== 'password' && field !== 'email') {
-                errorsList.push(Errors.invalidProp)
-            }
-            if (field === 'username') {
-                if (value.length <= 4) {
-                    errorsList.push(Errors.usernameLength)
-                }
-            } else if (field === 'password') {
-                if (value.length < 8) {
-                    errorsList.push(Errors.password)
-                }
-            }
-            return errorsList
-        }, [])
-        return errors
-    } else {
+    if (!username || !password) {
         return Errors.FailedLoginError
     }
+    const props = Object.entries(obj)
+    const errors = props.reduce((errorsList: object[], pair) => {
+        console.log(pair)
+        const field: string = pair[0]
+        const value = pair[1]
+        if (field !== 'username' && field !== 'fullname' && field !== 'password' && field !== 'email') {
+            errorsList.push(Errors.invalidProp)
+        }
+        if (field === 'username') {
+            if (value.length <= 4) {
+                errorsList.push(Errors.usernameLength)
+            }
+        } else if (field === 'password') {
+            if (value.length < 8) {
+                errorsList.push(Errors.password)
+            }
+        }
+        return errorsList
+    }, [{}])
+    return errors
 
 }
+
 export async function login(req, res) {
     const errors = validateBodyLogin(req.body)
     if (!errors) {
@@ -55,35 +56,31 @@ export async function login(req, res) {
     } else {
         res.send(errors)
     }
-
 }
 
 export async function register(req, res) {
     const { email, username, password, fullname } = req.body
-    if (email && username && password && fullname) {
-        const { username } = req.body
-        const errors = validateBodyUser(req.body)
-        if (!errors) {
-            const user = await getUserByUsername(username);
-            if (user) {
-                res.send(Errors.usernameExists)
-            } else {
-                try {
-                    const newUser = await createUser(req.body);
-                    res.send('welcome ' + username)
-                }
-                catch {
-                    res.status(400).send({ message: 'oy' });
-                }
-            }
-        } else {
-            res.send(errors)
-        }
-    } else {
-        res.send(Errors.missedFields)
+    if (!(email && username && password && fullname)) {
+        console.log('gets here')
+        return res.send(Errors.missedFields)
+    }
+    const errors = validateBodyUser(req.body)
+    if (errors) {
+        console.log('why')
+        console.log(errors)
+        return res.send(errors)
     }
 
+    const user = await getUserByUsername(username);
+    if (user) {
+        return res.send(Errors.usernameExists)
+    }
+    try {
+        const newUser = await createUser(req.body);
+        console.log(username)
+        return res.send('welcome ' + username)
+    }
+    catch {
+        res.status(400).send({ message: 'oy' });
+    }
 }
-
-
-
