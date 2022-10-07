@@ -1,7 +1,7 @@
 import express from 'express'
 import verifyUser from '../middlewares/verify-user'
 import upload from '../middlewares/upload'
-import {getPostById, getPosts, getFeed, getPostComments, getPostLikes, likes, unlike, createPost, getPostsByUsername } from '../controllers/posts-controller'
+import {getPostById, getPosts, getFeed, updatePost, valdiateUserAsCreatorOfPost, getPostComments, getPostLikes, likes, unlike, createPost, getPostsByUsername } from '../controllers/posts-controller'
 const router = express.Router()
 
 
@@ -19,7 +19,9 @@ router.get('/api/posts/:username', getPostsByUsername)
 router.get('/api/posts/:postId',getPostById)
 router.get('/api/posts/:postId/comments',getPostById, getPostComments) // if postId dont shown as query how to pass the middleware an id?
 router.get('/api/posts/:postId/likes',getPostById, getPostLikes)
-router.post('/api/posts', upload.array('media', 3), createPost)
+router.post('/api/post', upload.array('media', 3), createPost)
+router.put('/api/post/:postId', upload.array('media', 3), valdiateUserAsCreatorOfPost, updatePost)
+
 router.post('/api/posts/singleMedia', upload.single('media'), (req,res)=>{
 	console.log(`details: ${req.file}`)
 })

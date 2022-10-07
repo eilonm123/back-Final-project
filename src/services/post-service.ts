@@ -15,6 +15,10 @@ export async function serviceCreatePost(postData: IPost) {
     return newPost
 }
 
+export async function update(postData){
+    return []
+}
+
 export async function serviceGetFeed(offset = 0, limit = 5) {
     const allPosts = await PostModel.find({}).sort({created: -1}).skip(offset).limit(limit)
     return allPosts
@@ -28,5 +32,9 @@ export async function serviceGetPost(id) {
 export async function serviceGetPostsByUsername(username: string){
     const allPosts = await PostModel.find({}).populate("author")
     return allPosts
+}
+
+export default {
+    update
 }
 
