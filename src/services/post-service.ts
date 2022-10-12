@@ -3,9 +3,15 @@ import { Types } from 'mongoose'
 
 
 interface IPost {
-    author: Types.ObjectId;
+    author: Types.ObjectId | undefined;
     mediaList: String[];
-    body: String;
+    body: String | undefined;
+    caption?: String;
+}
+
+interface IPost {
+    mediaList: String[];
+    body: String | undefined;
     caption?: String;
 }
 
@@ -15,7 +21,16 @@ export async function serviceCreatePost(postData: IPost) {
     return newPost
 }
 
-export async function update(postData){
+export async function deletePost(userId: string, postId: string) {
+    const user = await PostModel.findOneAndDelete({ author: userId, _id: postId  })
+	return user
+}
+
+export async function update(postId, postDataUpdate){
+    const user = await PostModel.findOneAndUpdate({ _id: postId }, { $set: postDataUpdate }, {
+		new: true
+	});
+	return user
     return []
 }
 
@@ -35,6 +50,9 @@ export async function serviceGetPostsByUsername(username: string){
 }
 
 export default {
-    update
+    update,
+    deletePost,
+    serviceGetPostsByUsername,
+    serviceGetPost
 }
 

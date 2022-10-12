@@ -1,7 +1,9 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 
-
+type User = {
+    
+}
 
 
 const UserSchema = new mongoose.Schema({ // value's first letter must be a capital letter

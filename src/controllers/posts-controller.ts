@@ -1,40 +1,40 @@
 import { PostModel } from '../models/post'
-import { serviceCreatePost, serviceGetFeed, serviceGetPost, serviceGetPostsByUsername } from '../services/post-service'
+import { serviceCreatePost, serviceGetFeed, serviceGetPost, serviceGetPostsByUsername, update, deletePost as deletePostService } from '../services/post-service'
 import { NextFunction, Request, Response } from 'express'
 import { validatyeIdLength } from '../middlewares/validatyeIdLength'
-import { notFound } from '../util/PostsErrors';
 import { Errors } from '../util/PostsErrors'
+import { Types } from 'mongoose'
 import multer from 'multer'
+import { AuthenticatedRequest } from '../types';
 
 const PAGE_LIMIT = 5
 
 
-export async function getPostById(req: Request, res: Response, next: NextFunction) {
+export async function getPostById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     const id = req.params.postId
     const isValid = validatyeIdLength(id)
-    if (isValid) {
-        req.postId = id
-        next()
-    } else {
+    if (!isValid) {
         res.send(Errors.idLengthError)
-        // res.status(401).send()
     }
+    const post = await serviceGetPost(id)
+    if (!post) {
+        return res.send('post is not exists')
+    }
+    return res.send(post)
 }
-
-export async function valdiateUserAsCreatorOfPost(req: Request, res: Response, next: NextFunction) {
+export async function valdiateUserAsCreatorOfPost(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     const id = req.params.postId
-    const myId = req.id
+    const myId = req.id?.toHexString
     const isValid = validatyeIdLength(id)
     if (isValid) {
         const post = await serviceGetPost(id)
-        if (post) {
-            const userId = post.author
-            if (!userId === myId) {
-                res.send(Error.cantChangeOtherUserPost)
-            } else {
-                next()
-            }
+        const userId = post?.author
+        if (userId !== myId) {
+            res.send(Errors.cantChangeOtherUserPost)
+        } else {
+            next()
         }
+
     } else {
         res.send(Errors.idLengthError)
         // res.status(401).send()
@@ -49,24 +49,25 @@ export async function getPostsByUsername(req: Request, res: Response) {
         res.send(posts)
     } else {
         console.log('no posts yet')
-        res.send(`post ${notFound()}`)
+        res.send(`post not found}`)
     }
 }
 
 
 
-export async function createProfilePicture(req: request, res: Response) {
+export async function createProfilePicture(req: AuthenticatedRequest, res: Response) {
     try {
         if (req.file.mimetype !== 'image/jpeg' && req.file.mimetype !== 'image/jpg') {
-            res.send(Errors.fileFormat)
-        } else {
-            let { path: media } = req.file
-            const updatedMedia = media.replace('\\', '/') // trying to save it not as : uploads\\1664182746286-DoReMi.jpg
-            // const postData = { media, body, author }
-            // const post = await serviceCreatePost(postData)
-            // console.log(req.file.mimetype)
-            // res.send(post)
+            return res.send(Errors.fileFormat)
         }
+
+        let { path: media } = req.file
+        const updatedMedia = media.replace('\\', '/') // trying to save it not as : uploads\\1664182746286-DoReMi.jpg
+        // const postData = { media, body, author }
+        // const post = await serviceCreatePost(postData)
+        // console.log(req.file.mimetype)
+        // res.send(post)
+
     } catch {
         res.send(Errors.noFile)
     }
@@ -78,7 +79,7 @@ export async function createProfilePicture(req: request, res: Response) {
 export function getFilesErrors(files: {}[]) {
     const filesArray = files.map((file) => {
         const pairs = Object.entries(file)
-        const errors = pairs.reduce((errorsArray, pair) => {
+        const errors = pairs.reduce((errorsArray: {}[], pair) => {
             if (pair[0] !== 'fieldname' && pair[0] !== 'originalname' && pair[0] !== 'encoding' && pair[0] !== 'mimetype' && pair[0] !== 'destination' && pair[0] !== 'filename' && pair[0] !== 'path' && pair[0] !== 'size') {
                 errorsArray.push(Errors.invalidProp)
                 console.log(pair[0])
@@ -94,8 +95,27 @@ export function getFilesErrors(files: {}[]) {
     return filesArray[0]
 }
 
+export function getBodyErrors() {
 
-export async function createPost(req: Request, res: Response) {
+}
+
+export async function deletePost(req: AuthenticatedRequest, res: Response) {
+    const postId = req.params.postId /* gives an id */
+    if (postId.length !== 24) {
+        return res.send('id is to short')
+    }
+    const postIdConverted = new Types.ObjectId(postId)
+    const userId = req.id.toHexString()
+    console.log(typeof(postId), postId)
+    const user = await deletePostService(userId, postId)
+    if (!user) {
+        return res.send('post hasnt found')
+    }
+    return res.send(user)
+}
+
+
+export async function createPost(req: AuthenticatedRequest, res: Response) {
     const { body } = req.body
     const author = req.id
     if (!author) {
@@ -103,42 +123,53 @@ export async function createPost(req: Request, res: Response) {
     }
     try {
         const files = req.files
-        const validate = getFilesErrors(files)
-        if (validate) {
-            const postData = { mediaList, body, author }
-            const post = await serviceCreatePost(postData)
-            res.send(post)
+        const filesErrors = getFilesErrors(files)
+        if (filesErrors.length) {
+            return res.send(filesErrors)
         }
+        const mediaList = files.map(file => {
+            let { path: media } = file
+            return media
+        })
+        const postData = { mediaList, body, author }
+        const post = await serviceCreatePost(postData)
+        res.send(post)
     } catch {
         res.send(Errors.noFile)
     }
 }
 
-export async function updatePost(req: Request, res: Response) {
+export async function updatePost(req: AuthenticatedRequest, res: Response) {
     const id = req.params.postId
     const files = req.files
     const errorsList = getFilesErrors(files)
-    if (!errorsList.length) {
-        const myId = req.id
-        const post = await serviceGetPost(id)
-        const mediaList = files.map(file => {
-            let { path: media } = file
-            return media
-        })
-
-        if (post) {
-            const userId = post.author
-            if (!userId === myId) {
-                res.send(Errors.cantChangeOtherUserPost)
-            } else {
-                const { body } = req.body
-                const postData = { mediaList, body, myId }
-                const post = await serviceCreatePost(postData)
-                res.send(post)
-            }
-        }
+    console.log(errorsList)
+    if (errorsList.length) {
+        return res.send(errorsList)
+    }
+    const myId = req.id
+    const post = await serviceGetPost(id)
+    const mediaList = files.map(file => {
+        let { path: media } = file
+        return media
+    })
+    if (!post) {
+        return res.send('problem')
+    }
+    const userId = post.author
+    if (userId != myId?.toHexString()) {
+        return res.send(Errors.cantChangeOtherUserPost)
+    } else {
+        const { body } = req.body
+        const postData = { mediaList, body }
+        const post = await update(id, postData)
+        res.send(post)
     }
 }
+
+
+
+
 
 
 //             const { body } = req.body
